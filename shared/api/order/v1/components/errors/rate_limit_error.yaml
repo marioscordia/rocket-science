@@ -1,0 +1,16 @@
+type: object
+required:
+  - error
+  - message
+properties:
+  error:
+    type: string
+    example: "RATE_LIMIT_EXCEEDED"
+  message:
+    type: string
+    example: "Превышен лимит запросов"
+  retry_after:
+    type: integer
+    description: "Время в секундах до следующей попытки"
+    example: 60
+

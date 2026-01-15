@@ -1,0 +1,54 @@
+openapi: 3.0.3
+info:
+  title: OrderService API
+  version: 1.0.0
+  description: API для работы с данными о заказах
+x-ogen:
+  target: ./pkg/openapi/order/v1
+  package: order_v1
+  clean: true
+
+tags:
+  - name: Order
+    description: Операции с данными о заказе — получение и обновление информации
+
+paths:
+  /api/v1/orders:
+    $ref: "./paths/orders.yaml"
+  /api/v1/orders/{order_uuid}:
+    $ref: "./paths/order_by_uuid.yaml"
+  /api/v1/orders/{order_uuid}/pay:
+    $ref: "./paths/order_pay.yaml"
+  /api/v1/orders/{order_uuid}/cancel:
+    $ref: "./paths/order_cancel.yaml"
+
+components:
+  schemas:
+    PaymentMethod:
+      $ref: './components/payment_method.yaml'
+    
+    OrderStatus:
+      $ref: './components/order_status.yaml'
+    
+    CreateOrderRequest:
+      $ref: './components/create_order_request.yaml'
+    
+    CreateOrderResponse:
+      $ref: './components/create_order_response.yaml'
+    
+    PayOrderRequest:
+      $ref: './components/pay_order_request.yaml'
+    
+    PayOrderResponse:
+      $ref: './components/pay_order_response.yaml'
+    
+    OrderResponse:
+      $ref: './components/order_response.yaml'
+    
+    Error:
+      $ref: './components/error.yaml'
+  
+  parameters:
+    OrderUUID:
+      $ref: './params/order_uuid.yaml'
+

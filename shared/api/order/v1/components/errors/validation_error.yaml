@@ -1,0 +1,24 @@
+type: object
+required:
+  - error
+  - message
+  - validation_errors
+properties:
+  error:
+    type: string
+    example: "VALIDATION_ERROR"
+  message:
+    type: string
+    example: "Ошибка валидации"
+  validation_errors:
+    type: array
+    items:
+      type: object
+      properties:
+        field:
+          type: string
+          example: "part_uuids"
+        message:
+          type: string
+          example: "Список деталей не может быть пустым"
+

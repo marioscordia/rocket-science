@@ -1,0 +1,31 @@
+post:
+  tags:
+    - Order
+  summary: Создание заказа
+  description: Создаёт новый заказ на основе выбранных пользователем деталей
+  operationId: createOrder
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../order.openapi.yaml#/components/schemas/CreateOrderRequest'
+  responses:
+    '200':
+      description: Заказ успешно создан
+      content:
+        application/json:
+          schema:
+            $ref: '../order.openapi.yaml#/components/schemas/CreateOrderResponse'
+    '400':
+      description: Некорректный запрос
+      content:
+        application/json:
+          schema:
+            $ref: '../order.openapi.yaml#/components/schemas/Error'
+    '404':
+      description: Одна или несколько деталей не найдены
+      content:
+        application/json:
+          schema:
+            $ref: '../order.openapi.yaml#/components/schemas/Error'

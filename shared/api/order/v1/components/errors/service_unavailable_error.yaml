@@ -1,0 +1,12 @@
+type: object
+required:
+  - error
+  - message
+properties:
+  error:
+    type: string
+    example: "SERVICE_UNAVAILABLE"
+  message:
+    type: string
+    example: "Сервис временно недоступен"
+

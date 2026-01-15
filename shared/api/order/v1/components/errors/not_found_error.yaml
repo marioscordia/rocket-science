@@ -1,0 +1,12 @@
+type: object
+required:
+  - error
+  - message
+properties:
+  error:
+    type: string
+    example: "NOT_FOUND"
+  message:
+    type: string
+    example: "Заказ не найден"
+

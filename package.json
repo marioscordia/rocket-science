@@ -1,0 +1,8 @@
+{
+  "name": "rocket-science",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "@redocly/cli": "^2.14.5"
+  }
+}

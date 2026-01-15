@@ -1,0 +1,12 @@
+type: object
+required:
+  - error
+  - message
+properties:
+  error:
+    type: string
+    example: "UNAUTHORIZED"
+  message:
+    type: string
+    example: "Требуется авторизация"
+

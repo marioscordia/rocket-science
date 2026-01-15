@@ -1,0 +1,12 @@
+type: object
+required:
+  - error
+  - message
+properties:
+  error:
+    type: string
+    example: "INTERNAL_SERVER_ERROR"
+  message:
+    type: string
+    example: "Внутренняя ошибка сервера"
+

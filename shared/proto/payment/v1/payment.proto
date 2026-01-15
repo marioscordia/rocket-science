@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package payment.v1;
+
+option go_package = "github.com/marioscordia/rocket-science/shared/proto/payment/v1;paymentv1";
+
+// PaymentService handles order payment processing
+service PaymentService {
+  // PayOrder processes a payment command and returns a transaction UUID
+  rpc PayOrder(PayOrderRequest) returns (PayOrderResponse);
+}
+
+// PaymentMethod represents the payment method
+enum PaymentMethod {
+  PAYMENT_METHOD_UNKNOWN = 0;        // Unknown payment method
+  PAYMENT_METHOD_CARD = 1;           // Bank card
+  PAYMENT_METHOD_SBP = 2;            // Fast Payment System (Sistema Bystrykh Platezhey)
+  PAYMENT_METHOD_CREDIT_CARD = 3;    // Credit card
+  PAYMENT_METHOD_INVESTOR_MONEY = 4; // Investor money (internal method)
+}
+
+// PayOrderRequest is the request message for PayOrder
+message PayOrderRequest {
+  string order_uuid = 1;            // Order UUID
+  string user_uuid = 2;             // User UUID who initiates the payment
+  PaymentMethod payment_method = 3; // Selected payment method
+}
+
+// PayOrderResponse is the response message for PayOrder
+message PayOrderResponse {
+  string transaction_uuid = 1;  // Payment transaction UUID
+}

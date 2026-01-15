@@ -1,0 +1,23 @@
+post:
+  tags:
+    - Order
+  summary: Отменить заказ
+  description: Отменяет заказ
+  operationId: cancelOrder
+  parameters:
+    - $ref: '../order.openapi.yaml#/components/parameters/OrderUUID'
+  responses:
+    '204':
+      description: Заказ успешно отменён
+    '404':
+      description: Заказ не найден
+      content:
+        application/json:
+          schema:
+            $ref: '../order.openapi.yaml#/components/schemas/Error'
+    '409':
+      description: Заказ уже оплачен и не может быть отменён
+      content:
+        application/json:
+          schema:
+            $ref: '../order.openapi.yaml#/components/schemas/Error'

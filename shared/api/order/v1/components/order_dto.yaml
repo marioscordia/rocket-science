@@ -1,0 +1,18 @@
+type: object
+required:
+  - uuid
+  - status
+  - createdAt
+properties:
+  uuid:
+    type: string
+    format: uuid
+  status:
+    $ref: './enums/order_status.yaml'
+  createdAt:
+    type: string
+    format: date-time
+  updatedAt:
+    type: string
+    format: date-time
+

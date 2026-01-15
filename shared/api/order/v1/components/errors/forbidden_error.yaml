@@ -1,0 +1,12 @@
+type: object
+required:
+  - error
+  - message
+properties:
+  error:
+    type: string
+    example: "FORBIDDEN"
+  message:
+    type: string
+    example: "Доступ запрещён"
+

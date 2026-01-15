@@ -1,0 +1,12 @@
+type: object
+required:
+  - error
+  - message
+properties:
+  error:
+    type: string
+    example: "ERROR"
+  message:
+    type: string
+    example: "Произошла ошибка"
+

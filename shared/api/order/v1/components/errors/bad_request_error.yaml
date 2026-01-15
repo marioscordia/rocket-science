@@ -1,0 +1,15 @@
+type: object
+required:
+  - error
+  - message
+properties:
+  error:
+    type: string
+    example: "BAD_REQUEST"
+  message:
+    type: string
+    example: "Некорректный запрос"
+  details:
+    type: object
+    additionalProperties: true
+

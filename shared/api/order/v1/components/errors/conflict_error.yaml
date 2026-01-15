@@ -1,0 +1,12 @@
+type: object
+required:
+  - error
+  - message
+properties:
+  error:
+    type: string
+    example: "CONFLICT"
+  message:
+    type: string
+    example: "Заказ уже оплачен и не может быть отменён"
+

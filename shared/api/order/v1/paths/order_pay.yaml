@@ -1,0 +1,33 @@
+post:
+  tags:
+    - Order
+  summary: Оплата заказа
+  description: Проводит оплату ранее созданного заказа
+  operationId: payOrder
+  parameters:
+    - $ref: '../order.openapi.yaml#/components/parameters/OrderUUID'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../order.openapi.yaml#/components/schemas/PayOrderRequest'
+  responses:
+    '200':
+      description: Заказ успешно оплачен
+      content:
+        application/json:
+          schema:
+            $ref: '../order.openapi.yaml#/components/schemas/PayOrderResponse'
+    '400':
+      description: Некорректный запрос
+      content:
+        application/json:
+          schema:
+            $ref: '../order.openapi.yaml#/components/schemas/Error'
+    '404':
+      description: Заказ не найден
+      content:
+        application/json:
+          schema:
+            $ref: '../order.openapi.yaml#/components/schemas/Error'
