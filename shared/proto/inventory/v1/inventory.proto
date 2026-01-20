@@ -4,7 +4,7 @@ package inventory.v1;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/marioscordia/rocket-science/shared/proto/inventory/v1;inventoryv1";
+option go_package = "github.com/marioscordia/rocket-science/shared/pkg/proto/inventory/v1;inventoryv1";
 
 // InventoryService manages spaceship parts inventory
 service InventoryService {
@@ -17,79 +17,79 @@ service InventoryService {
 
 // Category represents the part category
 enum Category {
-  CATEGORY_UNKNOWN = 0;   // Unknown category
-  CATEGORY_ENGINE = 1;    // Engine
-  CATEGORY_FUEL = 2;      // Fuel
-  CATEGORY_PORTHOLE = 3;  // Porthole
-  CATEGORY_WING = 4;      // Wing
+  CATEGORY_UNSPECIFIED = 0; // Unknown category
+  CATEGORY_ENGINE = 1; // Engine
+  CATEGORY_FUEL = 2; // Fuel
+  CATEGORY_PORTHOLE = 3; // Porthole
+  CATEGORY_WING = 4; // Wing
 }
 
 // Value represents a flexible metadata value
 message Value {
   oneof value {
-    string string_value = 1;   // String value
-    int64 int64_value = 2;     // Integer value
-    double double_value = 3;   // Double value
-    bool bool_value = 4;       // Boolean value
+    string string_value = 1; // String value
+    int64 int64_value = 2; // Integer value
+    double double_value = 3; // Double value
+    bool bool_value = 4; // Boolean value
   }
 }
 
 // Dimensions represents the physical dimensions of a part
 message Dimensions {
-  double length = 1;  // Length in cm
-  double width = 2;   // Width in cm
-  double height = 3;  // Height in cm
-  double weight = 4;  // Weight in kg
+  double length = 1; // Length in cm
+  double width = 2; // Width in cm
+  double height = 3; // Height in cm
+  double weight = 4; // Weight in kg
 }
 
 // Manufacturer represents information about the part manufacturer
 message Manufacturer {
-  string name = 1;     // Manufacturer name
-  string country = 2;  // Country of manufacture
-  string website = 3;  // Manufacturer website
+  string name = 1; // Manufacturer name
+  string country = 2; // Country of manufacture
+  string website = 3; // Manufacturer website
 }
 
 // Part represents a spaceship part
 message Part {
-  string uuid = 1;                           // Unique identifier
-  string name = 2;                           // Part name
-  string description = 3;                    // Part description
-  double price = 4;                          // Price per unit
-  int64 stock_quantity = 5;                  // Quantity in stock
-  Category category = 6;                     // Category
-  Dimensions dimensions = 7;                 // Part dimensions
-  Manufacturer manufacturer = 8;             // Manufacturer information
-  repeated string tags = 9;                  // Tags for quick search
-  map<string, Value> metadata = 10;          // Flexible metadata
+  string uuid = 1; // Unique identifier
+  string name = 2; // Part name
+  string description = 3; // Part description
+  double price = 4; // Price per unit
+  int64 stock_quantity = 5; // Quantity in stock
+  Category category = 6; // Category
+  Dimensions dimensions = 7; // Part dimensions
+  Manufacturer manufacturer = 8; // Manufacturer information
+  repeated string tags = 9; // Tags for quick search
+  map<string, Value> metadata = 10; // Flexible metadata
   google.protobuf.Timestamp created_at = 11; // Creation date
   google.protobuf.Timestamp updated_at = 12; // Update date
 }
 
 // PartsFilter represents filtering options for listing parts
 message PartsFilter {
-  repeated string uuids = 1;                      // List of UUIDs (empty = no filter)
-  repeated string names = 2;                      // List of names (empty = no filter)
-  repeated Category categories = 3;               // List of categories (empty = no filter)
-  repeated string manufacturer_countries = 4;     // List of manufacturer countries (empty = no filter)
-  repeated string tags = 5;                       // List of tags (empty = no filter)
+  repeated string uuids = 1; // List of UUIDs (empty = no filter)
+  repeated string names = 2; // List of names (empty = no filter)
+  repeated Category categories = 3; // List of categories (empty = no filter)
+  repeated string manufacturer_countries = 4; // List of manufacturer countries (empty = no filter)
+  repeated string tags = 5; // List of tags (empty = no filter)
 }
 
 // GetPartRequest is the request message for GetPart
 message GetPartRequest {
-  string uuid = 1;  // Part UUID
+  string uuid = 1; // Part UUID
 }
 
 // GetPartResponse is the response message for GetPart
 message GetPartResponse {
-  Part part = 1;  // Part information
+  Part part = 1; // Part information
 }
 
 // ListPartsRequest is the request message for ListParts
 message ListPartsRequest {
-  PartsFilter filter = 1;  // Filter options (all fields are optional)
+  PartsFilter filter = 1; // Filter options (all fields are optional)
 }
 
 // ListPartsResponse is the response message for ListParts
 message ListPartsResponse {
-  repeated Part parts = 1;  // List of found parts
+  repeated Part parts = 1; // List of found parts
 }

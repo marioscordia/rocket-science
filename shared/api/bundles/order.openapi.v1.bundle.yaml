@@ -1,0 +1,254 @@
+openapi: 3.0.3
+info:
+  title: OrderService API
+  version: 1.0.0
+  description: API для работы с данными о заказах
+tags:
+  - name: Order
+    description: Операции с данными о заказе — получение и обновление информации
+paths:
+  /api/v1/orders:
+    post:
+      tags:
+        - Order
+      summary: Создание заказа
+      description: Создаёт новый заказ на основе выбранных пользователем деталей
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create_order_request'
+      responses:
+        '200':
+          description: Заказ успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/create_order_response'
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Одна или несколько деталей не найдены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /api/v1/orders/{order_uuid}:
+    get:
+      tags:
+        - Order
+      summary: Получить заказ по UUID
+      description: Возвращает информацию о заказе
+      operationId: getOrder
+      parameters:
+        - $ref: '#/components/parameters/order_uuid'
+      responses:
+        '200':
+          description: Информация о заказе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/order_response'
+        '404':
+          description: Заказ не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /api/v1/orders/{order_uuid}/pay:
+    post:
+      tags:
+        - Order
+      summary: Оплата заказа
+      description: Проводит оплату ранее созданного заказа
+      operationId: payOrder
+      parameters:
+        - $ref: '#/components/parameters/order_uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/pay_order_request'
+      responses:
+        '200':
+          description: Заказ успешно оплачен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/pay_order_response'
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Заказ не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /api/v1/orders/{order_uuid}/cancel:
+    post:
+      tags:
+        - Order
+      summary: Отменить заказ
+      description: Отменяет заказ
+      operationId: cancelOrder
+      parameters:
+        - $ref: '#/components/parameters/order_uuid'
+      responses:
+        '204':
+          description: Заказ успешно отменён
+        '404':
+          description: Заказ не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '409':
+          description: Заказ уже оплачен и не может быть отменён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+components:
+  schemas:
+    PaymentMethod:
+      $ref: '#/components/schemas/payment_method'
+    OrderStatus:
+      $ref: '#/components/schemas/order_status'
+    CreateOrderRequest:
+      $ref: '#/components/schemas/create_order_request'
+    CreateOrderResponse:
+      $ref: '#/components/schemas/create_order_response'
+    PayOrderRequest:
+      $ref: '#/components/schemas/pay_order_request'
+    PayOrderResponse:
+      $ref: '#/components/schemas/pay_order_response'
+    OrderResponse:
+      $ref: '#/components/schemas/order_response'
+    Error:
+      $ref: '#/components/schemas/error'
+    create_order_request:
+      type: object
+      required:
+        - user_uuid
+        - part_uuids
+      properties:
+        user_uuid:
+          type: string
+          description: UUID пользователя
+        part_uuids:
+          type: array
+          items:
+            type: string
+          description: Список UUID деталей
+    create_order_response:
+      type: object
+      required:
+        - order_uuid
+        - total_price
+      properties:
+        order_uuid:
+          type: string
+          description: Уникальный идентификатор заказа
+        total_price:
+          type: number
+          format: double
+          description: Итоговая стоимость
+    error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Описание ошибки
+    payment_method:
+      type: string
+      enum:
+        - UNKNOWN
+        - CARD
+        - SBP
+        - CREDIT_CARD
+        - INVESTOR_MONEY
+      description: Способ оплаты
+    order_status:
+      type: string
+      enum:
+        - PENDING_PAYMENT
+        - PAID
+        - CANCELLED
+      description: Статус заказа
+    order_response:
+      type: object
+      required:
+        - order_uuid
+        - user_uuid
+        - part_uuids
+        - total_price
+        - status
+      properties:
+        order_uuid:
+          type: string
+          description: Уникальный идентификатор заказа
+        user_uuid:
+          type: string
+          description: UUID пользователя
+        part_uuids:
+          type: array
+          items:
+            type: string
+          description: Список UUID деталей
+        total_price:
+          type: number
+          format: double
+          description: Итоговая стоимость
+        transaction_uuid:
+          type: string
+          nullable: true
+          description: UUID транзакции (если оплачен)
+        payment_method:
+          allOf:
+            - $ref: '#/components/schemas/payment_method'
+          nullable: true
+          description: Способ оплаты (если оплачен)
+        status:
+          $ref: '#/components/schemas/order_status'
+    pay_order_request:
+      type: object
+      required:
+        - payment_method
+      properties:
+        payment_method:
+          $ref: '#/components/schemas/payment_method'
+    pay_order_response:
+      type: object
+      required:
+        - transaction_uuid
+      properties:
+        transaction_uuid:
+          type: string
+          description: UUID транзакции
+  parameters:
+    OrderUUID:
+      $ref: '#/components/parameters/order_uuid'
+    order_uuid:
+      name: order_uuid
+      in: path
+      required: true
+      schema:
+        type: string
+      description: UUID заказа
+x-ogen:
+  target: /home/user/study/rocket-science/shared/pkg/openapi/order/v1
+  package: order_v1
+  clean: true

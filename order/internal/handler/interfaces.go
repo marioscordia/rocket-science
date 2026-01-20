@@ -7,8 +7,8 @@ import (
 )
 
 type UseCase interface {
-	CreateOrder(ctx context.Context, userID string, partIDs []string) error
+	CreateOrder(ctx context.Context, userID string, partIDs []string) (string, float64, error)
 	GetOrderByID(ctx context.Context, id string) (*dto.Order, error)
-	UpdateOrderStatus(ctx context.Context, id string, status string) error
-	UpdateOrderPayment(ctx context.Context, id string, transactionID string, paymentMethod string) error
+	PayOrder(ctx context.Context, id string, transactionID string, paymentMethod int32) (string, error)
+	CancelOrder(ctx context.Context, id string) error
 }
