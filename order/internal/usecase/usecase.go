@@ -13,6 +13,14 @@ type Usecase struct {
 	paymentService   PaymentService
 }
 
+func NewOrderUseCase(repo Repo, paymentSvc PaymentService, inventorySvc InventoryService, db any) *Usecase {
+	return &Usecase{
+		repo:             repo,
+		paymentService:   paymentSvc,
+		inventoryService: inventorySvc,
+	}
+}
+
 func (u *Usecase) CreateOrder(ctx context.Context, userID string, partIDs []string) (string, float64, error) {
 	if userID == "" {
 		return "", 0, dto.ErrInvalidUserID

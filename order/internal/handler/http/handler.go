@@ -10,6 +10,7 @@ import (
 )
 
 type Handler struct {
+	order_v1.UnimplementedHandler
 	useCase handler.UseCase
 }
 

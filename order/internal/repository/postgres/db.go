@@ -2,13 +2,28 @@ package postgres
 
 import (
 	"context"
+	"fmt"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/marioscordia/rocket-science/order/internal/dto"
 )
 
 type DB struct {
-	con *pgx.Conn
+	con *pgxpool.Pool
+}
+
+func NewDB(url string) (*DB, error) {
+	ctx := context.Background()
+	pool, err := pgxpool.New(ctx, url)
+	if err != nil {
+		return nil, fmt.Errorf("error connecting to pgx pool: %w", err)
+	}
+
+	if err := pool.Ping(ctx); err != nil {
+		return nil, fmt.Errorf("error pinging pgx pool: %w", err)
+	}
+
+	return &DB{con: pool}, nil
 }
 
 func (db *DB) CreateOrder(ctx context.Context, order *dto.CreateOrder) error {
