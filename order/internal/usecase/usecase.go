@@ -13,7 +13,7 @@ type Usecase struct {
 	paymentService   PaymentService
 }
 
-func NewOrderUseCase(repo Repo, paymentSvc PaymentService, inventorySvc InventoryService, db any) *Usecase {
+func NewOrderUseCase(repo Repo, paymentSvc PaymentService, inventorySvc InventoryService) *Usecase {
 	return &Usecase{
 		repo:             repo,
 		paymentService:   paymentSvc,
@@ -96,7 +96,7 @@ func (u *Usecase) CancelOrder(ctx context.Context, id string) error {
 	return nil
 }
 
-func (u *Usecase) PayOrder(ctx context.Context, id string, transactionID string, paymentMethod int32) (string, error) {
+func (u *Usecase) PayOrder(ctx context.Context, id string, transactionID string, paymentMethod string) (string, error) {
 	if id == "" {
 		return "", dto.ErrInvalidOrderID
 	}

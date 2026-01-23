@@ -7,8 +7,8 @@ import (
 )
 
 type Store interface {
-	CreateOrder(ctx context.Context, order *dto.CreateOrder) error
+	CreateOrder(ctx context.Context, order *dto.CreateOrder) (string, error)
 	GetOrderByID(ctx context.Context, id string) (*dto.Order, error)
 	UpdateOrderStatus(ctx context.Context, id string, status string) error
-	UpdateOrderPayment(ctx context.Context, id string, transactionID string, paymentMethod int32) error
+	UpdateOrderPayment(ctx context.Context, id string, transactionID string, paymentMethod string) error
 }

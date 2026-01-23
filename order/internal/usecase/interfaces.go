@@ -10,7 +10,7 @@ type Repo interface {
 	CreateOrder(ctx context.Context, order *dto.CreateOrder) (string, error)
 	GetOrderByID(ctx context.Context, id string) (*dto.Order, error)
 	UpdateOrderStatus(ctx context.Context, id string, status string) error
-	UpdateOrderPayment(ctx context.Context, id string, transactionID string, paymentMethod int32) error
+	UpdateOrderPayment(ctx context.Context, id string, transactionID string, paymentMethod string) error
 }
 
 type InventoryService interface {
@@ -18,5 +18,5 @@ type InventoryService interface {
 }
 
 type PaymentService interface {
-	ProcessPayment(ctx context.Context, orderID, userID string, paymentMethod int32) (string, error)
+	ProcessPayment(ctx context.Context, orderID, userID string, paymentMethod string) (string, error)
 }

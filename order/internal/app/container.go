@@ -2,13 +2,27 @@ package app
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/marioscordia/rocket-science/order/internal/config"
 	"github.com/marioscordia/rocket-science/order/internal/handler"
+	"github.com/marioscordia/rocket-science/order/internal/handler/http"
+	"github.com/marioscordia/rocket-science/order/internal/repository"
+	"github.com/marioscordia/rocket-science/order/internal/repository/postgres"
+	"github.com/marioscordia/rocket-science/order/internal/service/inventory"
+	"github.com/marioscordia/rocket-science/order/internal/service/payment"
 	"github.com/marioscordia/rocket-science/order/internal/usecase"
+	order_v1 "github.com/marioscordia/rocket-science/shared/pkg/openapi/order/v1"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type container struct {
+	server *order_v1.Server
+
+	handler *http.Handler
+
 	usecase handler.UseCase
 
 	repo usecase.Repo
@@ -20,19 +34,49 @@ type container struct {
 }
 
 func NewContainer() *container {
-	return &container{}
+	c := &container{}
+	return c
+}
+
+func (c *container) OpenAPIServer(ctx context.Context) *order_v1.Server {
+	if c.server == nil {
+		srv, err := order_v1.NewServer(c.Handler(ctx))
+		if err != nil {
+			panic(fmt.Errorf("failed to create openapi server: %w", err))
+		}
+
+		c.server = srv
+	}
+
+	return c.server
+}
+
+func (c *container) Handler(ctx context.Context) *http.Handler {
+	if c.handler == nil {
+		c.handler = http.NewHandler(c.UseCase(ctx))
+	}
+	return c.handler
 }
 
 func (c *container) UseCase(ctx context.Context) handler.UseCase {
 	if c.usecase == nil {
-		// TODO: Initialize usecase properly
+		c.usecase = usecase.NewOrderUseCase(
+			c.Repository(ctx),
+			c.PaymentService(ctx),
+			c.InventoryService(ctx),
+		)
 	}
 	return c.usecase
 }
 
 func (c *container) Repository(ctx context.Context) usecase.Repo {
 	if c.repo == nil {
-		// TODO: Initialize repository properly
+		store, err := postgres.NewDB(config.AppConfig().Postgre.GetURL())
+		if err != nil {
+			panic(fmt.Errorf("failed to connect to postgre: %w", err))
+		}
+
+		c.repo = repository.NewRepo(store)
 	}
 
 	return c.repo
@@ -40,7 +84,9 @@ func (c *container) Repository(ctx context.Context) usecase.Repo {
 
 func (c *container) PaymentService(ctx context.Context) usecase.PaymentService {
 	if c.paymentSvc == nil {
-		// TODO: Initialize payment service properly
+		conn := GetGRPCConnection(ctx, config.AppConfig().PaymentSvc.GetAddress(), "payment service")
+
+		c.paymentSvc = payment.NewService(conn)
 	}
 
 	return c.paymentSvc
@@ -48,16 +94,22 @@ func (c *container) PaymentService(ctx context.Context) usecase.PaymentService {
 
 func (c *container) InventoryService(ctx context.Context) usecase.InventoryService {
 	if c.inventorySvc == nil {
-		// TODO: Initialize inventory service properly
+		conn := GetGRPCConnection(ctx, config.AppConfig().InventorySvc.GetAddress(), "inventory service")
+
+		c.inventorySvc = inventory.NewService(conn)
 	}
 
 	return c.inventorySvc
 }
 
-func (c *container) DB(ctx context.Context) *pgxpool.Pool {
-	if c.db == nil {
-		// TODO: Initialize database connection properly
+func GetGRPCConnection(ctx context.Context, target, svcName string) grpc.ClientConnInterface {
+	conn, err := grpc.NewClient(
+		target,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		panic(fmt.Errorf("failed to create grpc connection to %s: %w", svcName, err))
 	}
 
-	return c.db
+	return conn
 }

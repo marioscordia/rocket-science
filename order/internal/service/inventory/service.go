@@ -5,10 +5,19 @@ import (
 
 	"github.com/marioscordia/rocket-science/order/internal/dto"
 	inventoryv1 "github.com/marioscordia/rocket-science/shared/pkg/proto/inventory/v1"
+	"google.golang.org/grpc"
 )
 
 type Service struct {
 	client inventoryv1.InventoryServiceClient
+}
+
+func NewService(conn grpc.ClientConnInterface) *Service {
+	client := inventoryv1.NewInventoryServiceClient(conn)
+
+	return &Service{
+		client: client,
+	}
 }
 
 func (s *Service) GetParts(ctx context.Context, partIDs []string) (map[string]*dto.Part, error) {

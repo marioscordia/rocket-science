@@ -10,9 +10,11 @@ import (
 var appConfig *config
 
 type config struct {
-	Logger  LoggerConfig
-	GRPC    GRPCConfig
-	Postgre PostgresConfig
+	Logger       LoggerConfig
+	GRPC         GRPCConfig
+	Postgre      PostgresConfig
+	InventorySvc GRPCConfig
+	PaymentSvc   GRPCConfig
 }
 
 func Load(path ...string) error {
@@ -31,15 +33,27 @@ func Load(path ...string) error {
 		return err
 	}
 
+	inventorySvcCfg, err := env.NewInventorySvcConfig()
+	if err != nil {
+		return err
+	}
+
+	paymentSvcCfg, err := env.NewPaymentSvcConfig()
+	if err != nil {
+		return err
+	}
+
 	postgreCfg, err := env.NewPostgreConfig()
 	if err != nil {
 		return err
 	}
 
 	appConfig = &config{
-		Logger:  loggerCfg,
-		GRPC:    grpcCfg,
-		Postgre: postgreCfg,
+		Logger:       loggerCfg,
+		GRPC:         grpcCfg,
+		Postgre:      postgreCfg,
+		InventorySvc: inventorySvcCfg,
+		PaymentSvc:   paymentSvcCfg,
 	}
 
 	return nil

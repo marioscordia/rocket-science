@@ -11,7 +11,11 @@ type Repo struct {
 	store Store
 }
 
-func (r *Repo) CreateOrder(ctx context.Context, order *dto.CreateOrder) error {
+func NewRepo(store Store) *Repo {
+	return &Repo{store: store}
+}
+
+func (r *Repo) CreateOrder(ctx context.Context, order *dto.CreateOrder) (string, error) {
 	order.ID = uuid.NewString()
 	order.Status = "pending"
 
@@ -26,6 +30,6 @@ func (r *Repo) UpdateOrderStatus(ctx context.Context, id string, status string) 
 	return r.store.UpdateOrderStatus(ctx, id, status)
 }
 
-func (r *Repo) UpdateOrderPayment(ctx context.Context, id string, transactionID string, paymentMethod int32) error {
+func (r *Repo) UpdateOrderPayment(ctx context.Context, id string, transactionID string, paymentMethod string) error {
 	return r.store.UpdateOrderPayment(ctx, id, transactionID, paymentMethod)
 }

@@ -14,6 +14,12 @@ type Handler struct {
 	useCase handler.UseCase
 }
 
+func NewHandler(useCase handler.UseCase) *Handler {
+	return &Handler{
+		useCase: useCase,
+	}
+}
+
 func (h *Handler) CancelOrder(ctx context.Context, params order_v1.CancelOrderParams) (order_v1.CancelOrderRes, error) {
 	if err := h.useCase.CancelOrder(ctx, params.OrderUUID); err != nil {
 		switch {
@@ -37,7 +43,7 @@ func (h *Handler) CancelOrder(ctx context.Context, params order_v1.CancelOrderPa
 	return &order_v1.CancelOrderNoContent{}, nil
 }
 
-func (h *Handler) CreateOrder(ctx context.Context, req order_v1.CreateOrderRequest) (order_v1.CreateOrderRes, error) {
+func (h *Handler) CreateOrder(ctx context.Context, req *order_v1.CreateOrderRequest) (order_v1.CreateOrderRes, error) {
 	orderID, totalPrice, err := h.useCase.CreateOrder(ctx, req.GetUserUUID(), req.GetPartUuids())
 	if err != nil {
 		switch {
@@ -102,7 +108,7 @@ func (h *Handler) GetOrder(ctx context.Context, params order_v1.GetOrderParams) 
 	}, nil
 }
 
-func (h *Handler) PayOrder(ctx context.Context, req order_v1.PayOrderRequest, params order_v1.PayOrderParams) (order_v1.PayOrderRes, error) {
+func (h *Handler) PayOrder(ctx context.Context, req *order_v1.PayOrderRequest, params order_v1.PayOrderParams) (order_v1.PayOrderRes, error) {
 	transactionID := ""
 
 	transactionID, err := h.useCase.PayOrder(ctx, params.OrderUUID, transactionID, string(req.GetPaymentMethod()))

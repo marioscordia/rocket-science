@@ -26,13 +26,13 @@ func NewDB(url string) (*DB, error) {
 	return &DB{con: pool}, nil
 }
 
-func (db *DB) CreateOrder(ctx context.Context, order *dto.CreateOrder) error {
+func (db *DB) CreateOrder(ctx context.Context, order *dto.CreateOrder) (string, error) {
 	_, err := db.con.Exec(ctx, "INSERT INTO orders (id, user_id, part_ids, price, status) VALUES ($1, $2, $3, $4, $5)",
 		order.ID, order.UserID, order.PartIds, order.Price, order.Status)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return order.ID, nil
 }
 
 func (db *DB) GetOrderByID(ctx context.Context, id string) (*dto.Order, error) {
@@ -54,7 +54,7 @@ func (db *DB) UpdateOrderStatus(ctx context.Context, id string, status string) e
 	return nil
 }
 
-func (db *DB) UpdateOrderPayment(ctx context.Context, id string, transactionID string, paymentMethod int32) error {
+func (db *DB) UpdateOrderPayment(ctx context.Context, id string, transactionID string, paymentMethod string) error {
 	_, err := db.con.Exec(ctx, "UPDATE orders SET transaction_id=$1, payment_method=$2, status=$3, updated_at=NOW() WHERE id=$4", transactionID, paymentMethod, "paid", id)
 	if err != nil {
 		return err
