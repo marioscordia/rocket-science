@@ -13,10 +13,15 @@ type Handler struct {
 	usecase handler.UseCase
 }
 
+func NewHandler(usecase handler.UseCase) *Handler {
+	return &Handler{
+		usecase: usecase,
+	}
+}
+
 func (h *Handler) GetPart(ctx context.Context, req *inventoryv1.GetPartRequest) (*inventoryv1.GetPartResponse, error) {
 	part, err := h.usecase.GetPartByID(ctx, req.GetUuid())
 	if err != nil {
-		// Handle error appropriately (e.g., return gRPC error codes)
 		return nil, err
 	}
 

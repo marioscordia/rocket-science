@@ -10,7 +10,13 @@ type UseCase struct {
 	repo Repo
 }
 
-func (u *UseCase) GetPartById(ctx context.Context, partID string) (*dto.Part, error) {
+func NewUseCase(repo Repo) *UseCase {
+	return &UseCase{
+		repo: repo,
+	}
+}
+
+func (u *UseCase) GetPartByID(ctx context.Context, partID string) (*dto.Part, error) {
 	return u.repo.GetPartByID(ctx, partID)
 }
 

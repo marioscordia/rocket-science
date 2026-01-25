@@ -10,6 +10,12 @@ type Repository struct {
 	store Store
 }
 
+func NewRepository(store Store) *Repository {
+	return &Repository{
+		store: store,
+	}
+}
+
 func (r *Repository) GetPartByID(ctx context.Context, partID string) (*dto.Part, error) {
 	return r.store.GetPartByID(ctx, partID)
 }

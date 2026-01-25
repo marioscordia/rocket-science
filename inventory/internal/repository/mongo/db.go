@@ -14,7 +14,7 @@ type DB struct {
 	conn *mongo.Collection
 }
 
-func New(collection *mongo.Collection) *DB {
+func NewMongo(collection *mongo.Collection) *DB {
 	return &DB{
 		conn: collection,
 	}

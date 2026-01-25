@@ -22,11 +22,12 @@ enum PaymentMethod {
 // PayOrderRequest is the request message for PayOrder
 message PayOrderRequest {
   string order_uuid = 1; // Order UUID
-  string user_uuid = 2; // User UUID who initiates the payment
+  double amount = 2; // Payment amount
   PaymentMethod payment_method = 3; // Selected payment method
 }
 
-// PayOrderResponse is the response message for PayOrder
 message PayOrderResponse {
-  string transaction_uuid = 1; // Payment transaction UUID
+  bool success = 1;           // Whether payment succeeded
+  string message = 2;         // Success/error message
+  string transaction_id = 3;  // Optional: unique transaction identifier
 }

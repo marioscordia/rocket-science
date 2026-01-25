@@ -9,32 +9,21 @@ tags:
 paths:
   /api/v1/orders:
     post:
-      tags:
-        - Order
-      summary: Создание заказа
-      description: Создаёт новый заказ на основе выбранных пользователем деталей
-      operationId: createOrder
+      summary: Создание нового заказа
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/create_order_request'
       responses:
-        '200':
-          description: Заказ успешно создан
+        '201':
+          description: Успешно создан заказ
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/create_order_response'
-        '400':
-          description: Некорректный запрос
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        '404':
-          description: Одна или несколько деталей не найдены
+        default:
+          description: Unexpected error
           content:
             application/json:
               schema:
@@ -151,6 +140,14 @@ components:
           items:
             type: string
           description: Список UUID деталей
+    error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Описание ошибки
     create_order_response:
       type: object
       required:
@@ -164,14 +161,6 @@ components:
           type: number
           format: double
           description: Итоговая стоимость
-    error:
-      type: object
-      required:
-        - message
-      properties:
-        message:
-          type: string
-          description: Описание ошибки
     payment_method:
       type: string
       enum:
@@ -249,6 +238,6 @@ components:
         type: string
       description: UUID заказа
 x-ogen:
-  target: /home/user/study/rocket-science/shared/pkg/openapi/order/v1
+  target: ../../pkg/openapi/order/v1
   package: order_v1
   clean: true
