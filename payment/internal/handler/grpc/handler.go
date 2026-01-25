@@ -12,11 +12,11 @@ type Handler struct {
 }
 
 func (h *Handler) PayOrder(ctx context.Context, req *paymentv1.PayOrderRequest) (*paymentv1.PayOrderResponse, error) {
-	// Implement your payment processing logic here
-	transactionID := uuid.NewString()
+	// TODO: Implement your payment processing logic here
 
-	// For demonstration, returning a dummy response
 	return &paymentv1.PayOrderResponse{
-		TransactionUuid: transactionID,
+		Success:       true,
+		Message:       "Payment processed successfully",
+		TransactionId: uuid.NewString(), // You'll need to import "github.com/google/uuid"
 	}, nil
 }
