@@ -4,12 +4,15 @@ go 1.25.1
 
 replace github.com/marioscordia/rocket-science/platform => ../platform
 
+replace github.com/marioscordia/rocket-science/shared => ../shared
+
 require (
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.8.0
 	github.com/marioscordia/rocket-science/shared v0.0.0-20260123092452-744905b44df8
 	go.uber.org/zap v1.27.1
 	google.golang.org/grpc v1.78.0
+	google.golang.org/protobuf v1.36.11
 )
 
 require (
@@ -38,7 +41,6 @@ require (
 	golang.org/x/sync v0.18.0 // indirect
 	golang.org/x/sys v0.38.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251029180050-ab9386a59fda // indirect
-	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
