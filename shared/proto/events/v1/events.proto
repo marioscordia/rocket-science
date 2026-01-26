@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package events.v1;
+
+import "payment/v1/payment.proto";
+
+option go_package = "github.com/marioscordia/rocket-science/shared/pkg/proto/events/v1;eventsv1";
+
+message OrderPaid {
+    string event_id = 1; // Unique identifier for the event
+    string order_id = 2; // Unique identifier for the order
+    string user_id = 3; // Unique identifier for the user
+    payment.v1.PaymentMethod payment_method = 4; // Payment method used
+}
