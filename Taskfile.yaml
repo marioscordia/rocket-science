@@ -14,6 +14,7 @@ vars:
   MOCKERY_VERSION: 'v2.53.3'
   GRPCURL_VERSION: 'v1.9.3'
   ENVSUBST_VERSION: 'v1.4.3'
+  GOOSE_VERSION: 'v3.26.0'
 
   BIN_DIR: '{{.ROOT_DIR}}/bin'
   GOLANGCI_LINT: '{{.BIN_DIR}}/golangci-lint'
@@ -27,6 +28,7 @@ vars:
   MOCKERY: "{{.BIN_DIR}}/mockery"
   GRPCURL: '{{.BIN_DIR}}/grpcurl'
   ENVSUBST: '{{.BIN_DIR}}/envsubst'
+  GOOSE: '{{.BIN_DIR}}/goose'
   ENVDIR: '{{.ROOT_DIR}}/deploy/env'
 
   NODE_MODULES_DIR: '{{.ROOT_DIR}}/node_modules/.bin'
@@ -111,7 +113,7 @@ tasks:
         [ -f {{.GOLANGCI_LINT}} ] || {
           mkdir -p {{.BIN_DIR}}
           echo "📦 Устанавливаем golangci-lint {{.GOLANGCI_LINT_VERSION}}..."
-          GOBIN={{.BIN_DIR}} go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@{{.GOLANGCI_LINT_VERSION}}
+          GOBIN={{.BIN_DIR}} go install github.com/golangci-lint/golangci-lint/v2/cmd/golangci-lint@{{.GOLANGCI_LINT_VERSION}}
         }
     status:
       - test -x {{.GOLANGCI_LINT}}
@@ -693,3 +695,79 @@ tasks:
           fi
         done
         exit $ERR
+  
+  goose:install:
+    desc: "Устанавливает goose в каталог bin"
+    cmds:
+      - |
+        [ -f {{.GOOSE}} ] || {
+          echo '📦 Устанавливаем goose {{.GOOSE_VERSION}}...'
+          GOBIN={{.BIN_DIR}} go install github.com/pressly/goose/v3/cmd/goose@{{.GOOSE_VERSION}}
+        }
+    status:
+      - test -x {{.GOOSE}}
+
+  migrate:create:
+    desc: "Создаёт новый файл миграции (usage: task migrate:create -- <name>)"
+    deps: [ goose:install ]
+    cmds:
+      - |
+        if [ -z "{{.CLI_ARGS}}" ]; then
+          echo "❌ Ошибка: укажите имя миграции"
+          echo "Использование: task migrate:create -- <migration_name>"
+          exit 1
+        fi
+        mkdir -p {{.ORDER_MIGRATIONS_DIR}}
+        echo "📝 Создаём миграцию: {{.CLI_ARGS}}"
+        
+        # Get list of files before creation
+        BEFORE=$(ls -1 {{.ORDER_MIGRATIONS_DIR}}/*.sql 2>/dev/null || true)
+        
+        {{.GOOSE}} -dir {{.ORDER_MIGRATIONS_DIR}} create {{.CLI_ARGS}} sql || {
+          echo "❌ Ошибка при создании миграции"
+          exit 1
+        }
+        
+        # Get list of files after creation and find the new one
+        AFTER=$(ls -1 {{.ORDER_MIGRATIONS_DIR}}/*.sql 2>/dev/null || true)
+        NEW_FILE=$(comm -13 <(echo "$BEFORE" | sort) <(echo "$AFTER" | sort))
+        
+        if [ -n "$NEW_FILE" ]; then
+          echo "✅ Миграция создана: $NEW_FILE"
+        else
+          echo "✅ Миграция создана в {{.ORDER_MIGRATIONS_DIR}}"
+        fi
+
+  migrate:up:
+    desc: "Применяет все pending миграции"
+    deps: [ goose:install ]
+    cmds:
+      - |
+        echo "⬆️ Применяем миграции..."
+        {{.GOOSE}} -dir {{.ORDER_MIGRATIONS_DIR}} postgres "{{.POSTGRES_DSN}}" up
+
+  migrate:down:
+    desc: "Откатывает последнюю миграцию"
+    deps: [ goose:install ]
+    prompt: "⚠️ Вы уверены, что хотите откатить миграцию?"
+    cmds:
+      - |
+        echo "⬇️ Откатываем последнюю миграцию..."
+        {{.GOOSE}} -dir {{.ORDER_MIGRATIONS_DIR}} postgres "{{.POSTGRES_DSN}}" down
+
+  migrate:status:
+    desc: "Показывает статус миграций"
+    deps: [ goose:install ]
+    cmds:
+      - |
+        echo "📊 Статус миграций:"
+        {{.GOOSE}} -dir {{.ORDER_MIGRATIONS_DIR}} postgres "{{.POSTGRES_DSN}}" status
+
+  migrate:reset:
+    desc: "Откатывает все миграции"
+    deps: [ goose:install ]
+    prompt: "🚨 Вы уверены? Это откатит ВСЕ миграции!"
+    cmds:
+      - |
+        echo "🔄 Откатываем все миграции..."
+        {{.GOOSE}} -dir {{.ORDER_MIGRATIONS_DIR}} postgres "{{.POSTGRES_DSN}}" reset
