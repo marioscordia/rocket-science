@@ -37,5 +37,5 @@ func (s *Service) ProcessPayment(ctx context.Context, orderID, userID string, pa
 		return "", err
 	}
 
-	return resp.TransactionUuid, nil
+	return resp.TransactionId, nil
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/marioscordia/rocket-science/order/internal/config"
 	"github.com/marioscordia/rocket-science/order/internal/handler"
 	"github.com/marioscordia/rocket-science/order/internal/handler/http"
+	"github.com/marioscordia/rocket-science/order/internal/migrator"
 	"github.com/marioscordia/rocket-science/order/internal/repository"
 	"github.com/marioscordia/rocket-science/order/internal/repository/postgres"
 	"github.com/marioscordia/rocket-science/order/internal/service/inventory"
@@ -27,11 +28,13 @@ type container struct {
 
 	repo usecase.Repo
 
+	pool *pgxpool.Pool
+
 	paymentSvc   usecase.PaymentService
 	inventorySvc usecase.InventoryService
-
-	db *pgxpool.Pool
 }
+
+const migrationsDir = "./migrations"
 
 func NewContainer() *container {
 	c := &container{}
@@ -71,7 +74,13 @@ func (c *container) UseCase(ctx context.Context) handler.UseCase {
 
 func (c *container) Repository(ctx context.Context) usecase.Repo {
 	if c.repo == nil {
-		store, err := postgres.NewDB(config.AppConfig().Postgre.GetURL())
+		pool := c.GetPool(ctx)
+
+		if err := migrator.Up(pool, migrationsDir); err != nil {
+			panic(fmt.Errorf("failed to run migrations: %w", err))
+		}
+
+		store, err := postgres.NewDB(pool)
 		if err != nil {
 			panic(fmt.Errorf("failed to connect to postgre: %w", err))
 		}
@@ -80,6 +89,19 @@ func (c *container) Repository(ctx context.Context) usecase.Repo {
 	}
 
 	return c.repo
+}
+
+func (c *container) GetPool(ctx context.Context) *pgxpool.Pool {
+	if c.pool == nil {
+		pool, err := pgxpool.New(ctx, config.AppConfig().Postgre.GetURL())
+		if err != nil {
+			panic(fmt.Errorf("failed to create pgx pool: %w", err))
+		}
+
+		c.pool = pool
+	}
+
+	return c.pool
 }
 
 func (c *container) PaymentService(ctx context.Context) usecase.PaymentService {
