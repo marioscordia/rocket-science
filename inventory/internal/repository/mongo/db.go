@@ -5,10 +5,13 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/marioscordia/rocket-science/inventory/internal/dto"
+	"github.com/marioscordia/rocket-science/inventory/internal/repository/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
+
+// ErrPartNotFound is returned when a part is not found in the database
+var ErrPartNotFound = errors.New("part not found")
 
 type DB struct {
 	conn *mongo.Collection
@@ -20,26 +23,26 @@ func NewMongo(collection *mongo.Collection) *DB {
 	}
 }
 
-func (db *DB) GetPartByID(ctx context.Context, partID string) (*dto.Part, error) {
+func (db *DB) GetPartByID(ctx context.Context, partID string) (*model.Part, error) {
 	if partID == "" {
 		return nil, errors.New("part ID cannot be empty")
 	}
 
-	var part Part
+	var part model.Part
 	filter := bson.M{"_id": partID}
 
 	err := db.conn.FindOne(ctx, filter).Decode(&part)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("part with ID %s not found", partID)
+			return nil, fmt.Errorf("%w: %s", ErrPartNotFound, partID)
 		}
 		return nil, fmt.Errorf("failed to get part: %w", err)
 	}
 
-	return part.ToDTO(), nil
+	return &part, nil
 }
 
-func (db *DB) ListParts(ctx context.Context, filter *dto.PartsFilter) ([]*dto.Part, error) {
+func (db *DB) ListParts(ctx context.Context, filter *model.PartsFilter) ([]*model.Part, error) {
 	mongoFilter := buildMongoFilter(filter)
 
 	cursor, err := db.conn.Find(ctx, mongoFilter)
@@ -48,20 +51,20 @@ func (db *DB) ListParts(ctx context.Context, filter *dto.PartsFilter) ([]*dto.Pa
 	}
 	defer cursor.Close(ctx)
 
-	var parts []*Part
+	var parts []*model.Part
 	if err := cursor.All(ctx, &parts); err != nil {
 		return nil, fmt.Errorf("failed to decode parts: %w", err)
 	}
 
-	dtoParts := make([]*dto.Part, len(parts))
+	modelParts := make([]*model.Part, len(parts))
 	for i, part := range parts {
-		dtoParts[i] = part.ToDTO()
+		modelParts[i] = part
 	}
 
-	return dtoParts, nil
+	return modelParts, nil
 }
 
-func buildMongoFilter(filter *dto.PartsFilter) bson.M {
+func buildMongoFilter(filter *model.PartsFilter) bson.M {
 	if filter == nil {
 		return bson.M{}
 	}

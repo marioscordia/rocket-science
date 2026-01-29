@@ -1,36 +1,39 @@
-package mongo
+package converter
 
-import "github.com/marioscordia/rocket-science/inventory/internal/dto"
+import (
+	"github.com/marioscordia/rocket-science/inventory/internal/dto"
+	"github.com/marioscordia/rocket-science/inventory/internal/repository/model"
+)
 
-// ToDTO converts a mongo Part to a dto.Part
-func (p *Part) ToDTO() *dto.Part {
-	if p == nil {
+// ToDTO converts a repository model Part to a dto.Part
+func ToDTO(m *model.Part) *dto.Part {
+	if m == nil {
 		return nil
 	}
 
 	return &dto.Part{
-		UUID:          p.UUID,
-		Name:          p.Name,
-		Description:   p.Description,
-		Price:         p.Price,
-		StockQuantity: p.StockQuantity,
-		Category:      categoryFromString(p.Category),
-		Dimensions:    convertDimensions(p.Dimensions),
-		Manufacturer:  convertManufacturer(p.Manufacturer),
-		Tags:          p.Tags,
-		Metadata:      convertMetadata(p.Metadata),
-		CreatedAt:     p.CreatedAt,
-		UpdatedAt:     p.UpdatedAt,
+		UUID:          m.UUID,
+		Name:          m.Name,
+		Description:   m.Description,
+		Price:         m.Price,
+		StockQuantity: m.StockQuantity,
+		Category:      categoryFromString(m.Category),
+		Dimensions:    convertDimensionsToDTO(m.Dimensions),
+		Manufacturer:  convertManufacturerToDTO(m.Manufacturer),
+		Tags:          m.Tags,
+		Metadata:      convertMetadataToDTO(m.Metadata),
+		CreatedAt:     m.CreatedAt,
+		UpdatedAt:     m.UpdatedAt,
 	}
 }
 
-// FromDTO converts a dto.Part to a mongo Part
-func FromDTO(d *dto.Part) *Part {
+// FromDTO converts a dto.Part to a repository model Part
+func FromDTO(d *dto.Part) *model.Part {
 	if d == nil {
 		return nil
 	}
 
-	return &Part{
+	return &model.Part{
 		UUID:          d.UUID,
 		Name:          d.Name,
 		Description:   d.Description,
@@ -46,7 +49,35 @@ func FromDTO(d *dto.Part) *Part {
 	}
 }
 
-func convertDimensions(d *Dimensions) dto.Dimensions {
+// ToDTOList converts a slice of model.Part to a slice of dto.Part
+func ToDTOList(parts []*model.Part) []*dto.Part {
+	if parts == nil {
+		return nil
+	}
+
+	result := make([]*dto.Part, len(parts))
+	for i, p := range parts {
+		result[i] = ToDTO(p)
+	}
+	return result
+}
+
+// FilterToModel converts a dto.PartsFilter to a model.PartsFilter
+func FilterToModel(f *dto.PartsFilter) *model.PartsFilter {
+	if f == nil {
+		return nil
+	}
+
+	return &model.PartsFilter{
+		UUIDs:                 f.UUIDs,
+		Names:                 f.Names,
+		Categories:            f.Categories,
+		ManufacturerCountries: f.ManufacturerCountries,
+		Tags:                  f.Tags,
+	}
+}
+
+func convertDimensionsToDTO(d *model.Dimensions) dto.Dimensions {
 	if d == nil {
 		return dto.Dimensions{}
 	}
@@ -58,8 +89,8 @@ func convertDimensions(d *Dimensions) dto.Dimensions {
 	}
 }
 
-func convertDimensionsFromDTO(d dto.Dimensions) *Dimensions {
-	return &Dimensions{
+func convertDimensionsFromDTO(d dto.Dimensions) *model.Dimensions {
+	return &model.Dimensions{
 		Length: d.Length,
 		Width:  d.Width,
 		Height: d.Height,
@@ -67,7 +98,7 @@ func convertDimensionsFromDTO(d dto.Dimensions) *Dimensions {
 	}
 }
 
-func convertManufacturer(m *Manufacturer) dto.Manufacturer {
+func convertManufacturerToDTO(m *model.Manufacturer) dto.Manufacturer {
 	if m == nil {
 		return dto.Manufacturer{}
 	}
@@ -78,27 +109,27 @@ func convertManufacturer(m *Manufacturer) dto.Manufacturer {
 	}
 }
 
-func convertManufacturerFromDTO(m dto.Manufacturer) *Manufacturer {
-	return &Manufacturer{
+func convertManufacturerFromDTO(m dto.Manufacturer) *model.Manufacturer {
+	return &model.Manufacturer{
 		Name:    m.Name,
 		Country: m.Country,
 		Website: m.Website,
 	}
 }
 
-func convertMetadata(m map[string]interface{}) map[string]*dto.Value {
+func convertMetadataToDTO(m map[string]interface{}) map[string]*dto.Value {
 	if m == nil {
 		return nil
 	}
 
 	result := make(map[string]*dto.Value, len(m))
 	for k, v := range m {
-		result[k] = convertValue(v)
+		result[k] = convertValueToDTO(v)
 	}
 	return result
 }
 
-func convertValue(v interface{}) *dto.Value {
+func convertValueToDTO(v interface{}) *dto.Value {
 	if v == nil {
 		return nil
 	}

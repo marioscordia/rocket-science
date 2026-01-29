@@ -2,11 +2,16 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/marioscordia/rocket-science/order/internal/dto"
+	"github.com/marioscordia/rocket-science/order/internal/repository/model"
 )
+
+// ErrOrderNotFound is returned when an order is not found in the database
+var ErrOrderNotFound = errors.New("order not found")
 
 type DB struct {
 	con *pgxpool.Pool
@@ -26,20 +31,23 @@ func NewDB(url string) (*DB, error) {
 	return &DB{con: pool}, nil
 }
 
-func (db *DB) CreateOrder(ctx context.Context, order *dto.CreateOrder) (string, error) {
+func (db *DB) CreateOrder(ctx context.Context, order *model.CreateOrder) (string, error) {
 	_, err := db.con.Exec(ctx, "INSERT INTO orders (id, user_id, part_ids, price, status) VALUES ($1, $2, $3, $4, $5)",
-		order.ID, order.UserID, order.PartIds, order.Price, order.Status)
+		order.ID, order.UserID, order.PartIDs, order.Price, order.Status)
 	if err != nil {
 		return "", err
 	}
 	return order.ID, nil
 }
 
-func (db *DB) GetOrderByID(ctx context.Context, id string) (*dto.Order, error) {
-	order := &dto.Order{}
+func (db *DB) GetOrderByID(ctx context.Context, id string) (*model.Order, error) {
+	order := &model.Order{}
 	row := db.con.QueryRow(ctx, "SELECT id, user_id, part_ids, price, transaction_id, payment_method, status, created_at, updated_at FROM orders WHERE id=$1", id)
 	err := row.Scan(&order.ID, &order.UserID, &order.PartIDs, &order.Price, &order.TransactionID, &order.PaymentMethod, &order.Status, &order.CreatedAt, &order.UpdatedAt)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, ErrOrderNotFound
+		}
 		return nil, err
 	}
 

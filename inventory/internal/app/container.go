@@ -7,6 +7,7 @@ import (
 	"github.com/marioscordia/rocket-science/inventory/internal/config"
 	"github.com/marioscordia/rocket-science/inventory/internal/handler"
 	"github.com/marioscordia/rocket-science/inventory/internal/handler/grpc"
+	"github.com/marioscordia/rocket-science/inventory/internal/repository"
 	"github.com/marioscordia/rocket-science/inventory/internal/usecase"
 	"github.com/marioscordia/rocket-science/platform/pkg/closer"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -21,6 +22,7 @@ type container struct {
 	usecase handler.UseCase
 	repo    usecase.Repo
 
+	mongoStore        repository.Store
 	mongoDBClient     *mongo.Client
 	mongoDBHandle     *mongo.Database
 	mongoDBCollection *mongo.Collection
@@ -48,10 +50,18 @@ func (c *container) Usecase(ctx context.Context) handler.UseCase {
 
 func (c *container) Repository(ctx context.Context) usecase.Repo {
 	if c.repo == nil {
-		c.repo = mongoStore.NewMongo(c.MongoDBCollection(ctx))
+		c.repo = repository.NewRepository(c.MongoStore(ctx))
 	}
 
 	return c.repo
+}
+
+func (d *container) MongoStore(ctx context.Context) repository.Store {
+	if d.mongoStore == nil {
+		d.mongoStore = mongoStore.NewMongo(d.MongoDBCollection(ctx))
+	}
+
+	return d.mongoStore
 }
 
 func (d *container) MongoDBClient(ctx context.Context) *mongo.Client {

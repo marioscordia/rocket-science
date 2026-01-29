@@ -75,11 +75,20 @@ func (h *Handler) CreateOrder(ctx context.Context, req *order_v1.CreateOrderRequ
 func (h *Handler) GetOrder(ctx context.Context, params order_v1.GetOrderParams) (order_v1.GetOrderRes, error) {
 	order, err := h.useCase.GetOrderByID(ctx, params.OrderUUID)
 	if err != nil {
-		// Since GetOrderRes interface likely only has OrderResponse and Error types
-		// we return a generic error response
-		return &order_v1.Error{
-			Message: err.Error(),
-		}, nil
+		switch {
+		case errors.Is(err, dto.ErrOrderNotFound):
+			return &order_v1.Error{
+				Message: "Order not found",
+			}, nil
+		case errors.Is(err, dto.ErrInvalidOrderID):
+			return &order_v1.Error{
+				Message: err.Error(),
+			}, nil
+		default:
+			return &order_v1.Error{
+				Message: "Failed to get order",
+			}, nil
+		}
 	}
 
 	// Map transaction ID and payment method to optional fields

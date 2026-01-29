@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/marioscordia/rocket-science/inventory/internal/dto"
+	"github.com/marioscordia/rocket-science/inventory/internal/repository/converter"
 )
 
 type Repository struct {
@@ -17,9 +18,17 @@ func NewRepository(store Store) *Repository {
 }
 
 func (r *Repository) GetPartByID(ctx context.Context, partID string) (*dto.Part, error) {
-	return r.store.GetPartByID(ctx, partID)
+	part, err := r.store.GetPartByID(ctx, partID)
+	if err != nil {
+		return nil, err
+	}
+	return converter.ToDTO(part), nil
 }
 
 func (r *Repository) ListParts(ctx context.Context, filter *dto.PartsFilter) ([]*dto.Part, error) {
-	return r.store.ListParts(ctx, filter)
+	parts, err := r.store.ListParts(ctx, converter.FilterToModel(filter))
+	if err != nil {
+		return nil, err
+	}
+	return converter.ToDTOList(parts), nil
 }

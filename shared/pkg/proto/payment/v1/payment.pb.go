@@ -81,7 +81,7 @@ func (PaymentMethod) EnumDescriptor() ([]byte, []int) {
 type PayOrderRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	OrderUuid     string                 `protobuf:"bytes,1,opt,name=order_uuid,json=orderUuid,proto3" json:"order_uuid,omitempty"`                                            // Order UUID
-	Amount        float64                `protobuf:"fixed64,2,opt,name=amount,proto3" json:"amount,omitempty"`                                                                 // Payment amount
+	UserUuid      string                 `protobuf:"bytes,2,opt,name=user_uuid,json=userUuid,proto3" json:"user_uuid,omitempty"`                                               // User UUID
 	PaymentMethod PaymentMethod          `protobuf:"varint,3,opt,name=payment_method,json=paymentMethod,proto3,enum=payment.v1.PaymentMethod" json:"payment_method,omitempty"` // Selected payment method
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -124,11 +124,11 @@ func (x *PayOrderRequest) GetOrderUuid() string {
 	return ""
 }
 
-func (x *PayOrderRequest) GetAmount() float64 {
+func (x *PayOrderRequest) GetUserUuid() string {
 	if x != nil {
-		return x.Amount
+		return x.UserUuid
 	}
-	return 0
+	return ""
 }
 
 func (x *PayOrderRequest) GetPaymentMethod() PaymentMethod {
@@ -140,9 +140,7 @@ func (x *PayOrderRequest) GetPaymentMethod() PaymentMethod {
 
 type PayOrderResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`                                 // Whether payment succeeded
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`                                  // Success/error message
-	TransactionId string                 `protobuf:"bytes,3,opt,name=transaction_id,json=transactionId,proto3" json:"transaction_id,omitempty"` // Optional: unique transaction identifier
+	TransactionId string                 `protobuf:"bytes,1,opt,name=transaction_id,json=transactionId,proto3" json:"transaction_id,omitempty"` // Optional: unique transaction identifier
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -177,20 +175,6 @@ func (*PayOrderResponse) Descriptor() ([]byte, []int) {
 	return file_payment_v1_payment_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *PayOrderResponse) GetSuccess() bool {
-	if x != nil {
-		return x.Success
-	}
-	return false
-}
-
-func (x *PayOrderResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
-
 func (x *PayOrderResponse) GetTransactionId() string {
 	if x != nil {
 		return x.TransactionId
@@ -203,16 +187,14 @@ var File_payment_v1_payment_proto protoreflect.FileDescriptor
 const file_payment_v1_payment_proto_rawDesc = "" +
 	"\n" +
 	"\x18payment/v1/payment.proto\x12\n" +
-	"payment.v1\"\x8a\x01\n" +
+	"payment.v1\"\x8f\x01\n" +
 	"\x0fPayOrderRequest\x12\x1d\n" +
 	"\n" +
-	"order_uuid\x18\x01 \x01(\tR\torderUuid\x12\x16\n" +
-	"\x06amount\x18\x02 \x01(\x01R\x06amount\x12@\n" +
-	"\x0epayment_method\x18\x03 \x01(\x0e2\x19.payment.v1.PaymentMethodR\rpaymentMethod\"m\n" +
-	"\x10PayOrderResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\x12%\n" +
-	"\x0etransaction_id\x18\x03 \x01(\tR\rtransactionId*\xa3\x01\n" +
+	"order_uuid\x18\x01 \x01(\tR\torderUuid\x12\x1b\n" +
+	"\tuser_uuid\x18\x02 \x01(\tR\buserUuid\x12@\n" +
+	"\x0epayment_method\x18\x03 \x01(\x0e2\x19.payment.v1.PaymentMethodR\rpaymentMethod\"9\n" +
+	"\x10PayOrderResponse\x12%\n" +
+	"\x0etransaction_id\x18\x01 \x01(\tR\rtransactionId*\xa3\x01\n" +
 	"\rPaymentMethod\x12\x1e\n" +
 	"\x1aPAYMENT_METHOD_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13PAYMENT_METHOD_CARD\x10\x01\x12\x16\n" +

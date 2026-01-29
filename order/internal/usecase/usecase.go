@@ -96,14 +96,14 @@ func (u *Usecase) CancelOrder(ctx context.Context, id string) error {
 	return nil
 }
 
-func (u *Usecase) PayOrder(ctx context.Context, id string, transactionID string, paymentMethod string) (string, error) {
-	if id == "" {
+func (u *Usecase) PayOrder(ctx context.Context, orderID string, transactionID string, paymentMethod string) (string, error) {
+	if orderID == "" {
 		return "", dto.ErrInvalidOrderID
 	}
 
-	order, err := u.repo.GetOrderByID(ctx, id)
+	order, err := u.repo.GetOrderByID(ctx, orderID)
 	if err != nil {
-		return "", fmt.Errorf("%w: %s", dto.ErrOrderNotFound, id)
+		return "", fmt.Errorf("%w: %s", dto.ErrOrderNotFound, orderID)
 	}
 
 	if order.Status == "paid" {
@@ -114,12 +114,12 @@ func (u *Usecase) PayOrder(ctx context.Context, id string, transactionID string,
 		return "", dto.ErrOrderCannotBePaid
 	}
 
-	transactionID, err = u.paymentService.ProcessPayment(ctx, id, order.UserID, paymentMethod)
+	transactionID, err = u.paymentService.ProcessPayment(ctx, orderID, order.UserID, paymentMethod)
 	if err != nil {
 		return "", fmt.Errorf("%w: %v", dto.ErrPaymentFailed, err)
 	}
 
-	if err := u.repo.UpdateOrderPayment(ctx, id, transactionID, paymentMethod); err != nil {
+	if err := u.repo.UpdateOrderPayment(ctx, orderID, transactionID, paymentMethod); err != nil {
 		return "", fmt.Errorf("failed to update order payment: %w", err)
 	}
 
