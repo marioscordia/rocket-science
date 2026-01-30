@@ -12,3 +12,8 @@ type GRPCConfig interface {
 type PostgresConfig interface {
 	GetURL() string
 }
+
+type HTTPConfig interface {
+	GetAddress() string
+	GetReadTimeout() int
+}

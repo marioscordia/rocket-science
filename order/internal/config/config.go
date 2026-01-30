@@ -12,6 +12,7 @@ var appConfig *config
 type config struct {
 	Logger       LoggerConfig
 	GRPC         GRPCConfig
+	HTTP         HTTPConfig
 	Postgre      PostgresConfig
 	InventorySvc GRPCConfig
 	PaymentSvc   GRPCConfig
@@ -28,7 +29,7 @@ func Load(path ...string) error {
 		return err
 	}
 
-	grpcCfg, err := env.NewOrderGRPCConfig()
+	httpCfg, err := env.NewHTTPConfig()
 	if err != nil {
 		return err
 	}
@@ -50,7 +51,7 @@ func Load(path ...string) error {
 
 	appConfig = &config{
 		Logger:       loggerCfg,
-		GRPC:         grpcCfg,
+		HTTP:         httpCfg,
 		Postgre:      postgreCfg,
 		InventorySvc: inventorySvcCfg,
 		PaymentSvc:   paymentSvcCfg,

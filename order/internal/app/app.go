@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/marioscordia/rocket-science/order/internal/config"
 	"github.com/marioscordia/rocket-science/platform/pkg/closer"
@@ -63,15 +64,16 @@ func (a *App) initCloser(_ context.Context) error {
 
 func (a *App) initHttpServer(ctx context.Context) error {
 	a.httpServer = &http.Server{
-		Addr:    config.AppConfig().GRPC.GetAddress(),
-		Handler: a.container.OpenAPIServer(ctx),
+		Addr:        config.AppConfig().HTTP.GetAddress(),
+		ReadTimeout: time.Duration(config.AppConfig().HTTP.GetReadTimeout()) * time.Second,
+		Handler:     a.container.OpenAPIServer(ctx),
 	}
 
 	return nil
 }
 
 func (a *App) Run(ctx context.Context) error {
-	logger.Info(ctx, fmt.Sprintf("🚀 gRPC InventoryService server listening on %s", config.AppConfig().GRPC.GetAddress()))
+	logger.Info(ctx, fmt.Sprintf("🚀 HTTP OrderService server listening on %s", config.AppConfig().HTTP.GetAddress()))
 
 	return a.httpServer.ListenAndServe()
 }

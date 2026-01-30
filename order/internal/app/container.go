@@ -14,6 +14,7 @@ import (
 	"github.com/marioscordia/rocket-science/order/internal/service/inventory"
 	"github.com/marioscordia/rocket-science/order/internal/service/payment"
 	"github.com/marioscordia/rocket-science/order/internal/usecase"
+	"github.com/marioscordia/rocket-science/platform/pkg/closer"
 	order_v1 "github.com/marioscordia/rocket-science/shared/pkg/openapi/order/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -97,6 +98,11 @@ func (c *container) GetPool(ctx context.Context) *pgxpool.Pool {
 		if err != nil {
 			panic(fmt.Errorf("failed to create pgx pool: %w", err))
 		}
+
+		closer.AddNamed("Pgx pool", func(_ context.Context) error {
+			pool.Close()
+			return nil
+		})
 
 		c.pool = pool
 	}
