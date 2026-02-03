@@ -33,27 +33,15 @@ func Load(path ...string) error {
 		return err
 	}
 
-	inventorySvcCfg, err := env.NewInventorySvcConfig()
-	if err != nil {
-		return err
-	}
-
-	paymentSvcCfg, err := env.NewPaymentSvcConfig()
-	if err != nil {
-		return err
-	}
-
 	mongoCfg, err := env.NewMongoConfig()
 	if err != nil {
 		return err
 	}
 
 	appConfig = &config{
-		Logger:       loggerCfg,
-		GRPC:         grpcCfg,
-		Mongo:        mongoCfg,
-		InventorySvc: inventorySvcCfg,
-		PaymentSvc:   paymentSvcCfg,
+		Logger: loggerCfg,
+		GRPC:   grpcCfg,
+		Mongo:  mongoCfg,
 	}
 
 	return nil

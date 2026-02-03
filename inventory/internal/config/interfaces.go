@@ -9,10 +9,6 @@ type GRPCConfig interface {
 	GetAddress() string
 }
 
-type PostgresConfig interface {
-	GetURL() string
-}
-
 type MongoConfig interface {
 	GetURI() string
 	GetDatabase() string

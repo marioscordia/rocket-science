@@ -18,7 +18,7 @@ type loggerConfig struct {
 func NewLoggerConfig() (*loggerConfig, error) {
 	var raw loggerEnvConfig
 	if err := env.Parse(&raw); err != nil {
-		return nil, fmt.Errorf("error parsing for Logger config")
+		return nil, fmt.Errorf("error parsing for Logger config: %w", err)
 	}
 
 	return &loggerConfig{raw: raw}, nil

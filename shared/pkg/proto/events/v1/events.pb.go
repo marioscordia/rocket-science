@@ -28,6 +28,7 @@ type OrderPaid struct {
 	OrderId       string                 `protobuf:"bytes,2,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`                                                  // Unique identifier for the order
 	UserId        string                 `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                                                     // Unique identifier for the user
 	PaymentMethod v1.PaymentMethod       `protobuf:"varint,4,opt,name=payment_method,json=paymentMethod,proto3,enum=payment.v1.PaymentMethod" json:"payment_method,omitempty"` // Payment method used
+	TransactionId string                 `protobuf:"bytes,5,opt,name=transaction_id,json=transactionId,proto3" json:"transaction_id,omitempty"`                                // Transaction identifier
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -90,16 +91,24 @@ func (x *OrderPaid) GetPaymentMethod() v1.PaymentMethod {
 	return v1.PaymentMethod(0)
 }
 
+func (x *OrderPaid) GetTransactionId() string {
+	if x != nil {
+		return x.TransactionId
+	}
+	return ""
+}
+
 var File_events_v1_events_proto protoreflect.FileDescriptor
 
 const file_events_v1_events_proto_rawDesc = "" +
 	"\n" +
-	"\x16events/v1/events.proto\x12\tevents.v1\x1a\x18payment/v1/payment.proto\"\x9c\x01\n" +
+	"\x16events/v1/events.proto\x12\tevents.v1\x1a\x18payment/v1/payment.proto\"\xc3\x01\n" +
 	"\tOrderPaid\x12\x19\n" +
 	"\bevent_id\x18\x01 \x01(\tR\aeventId\x12\x19\n" +
 	"\border_id\x18\x02 \x01(\tR\aorderId\x12\x17\n" +
 	"\auser_id\x18\x03 \x01(\tR\x06userId\x12@\n" +
-	"\x0epayment_method\x18\x04 \x01(\x0e2\x19.payment.v1.PaymentMethodR\rpaymentMethodBLZJgithub.com/marioscordia/rocket-science/shared/pkg/proto/events/v1;eventsv1b\x06proto3"
+	"\x0epayment_method\x18\x04 \x01(\x0e2\x19.payment.v1.PaymentMethodR\rpaymentMethod\x12%\n" +
+	"\x0etransaction_id\x18\x05 \x01(\tR\rtransactionIdBLZJgithub.com/marioscordia/rocket-science/shared/pkg/proto/events/v1;eventsv1b\x06proto3"
 
 var (
 	file_events_v1_events_proto_rawDescOnce sync.Once

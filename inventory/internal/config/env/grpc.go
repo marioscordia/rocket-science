@@ -19,7 +19,7 @@ type orderGRPCConfig struct {
 func NewOrderGRPCConfig() (*orderGRPCConfig, error) {
 	var raw orderGRPCEnvConfig
 	if err := env.Parse(&raw); err != nil {
-		return nil, fmt.Errorf("error parsing for GRPC config")
+		return nil, fmt.Errorf("error parsing for GRPC config: %w", err)
 	}
 
 	return &orderGRPCConfig{raw: raw}, nil

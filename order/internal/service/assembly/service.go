@@ -30,6 +30,7 @@ func (p *Service) ProduceUFORecorded(ctx context.Context, event dto.OrderPaidEve
 		OrderId:       event.OrderID,
 		UserId:        event.UserID,
 		PaymentMethod: paymentv1.PaymentMethod(paymentv1.PaymentMethod_value[event.PaymentMethod]),
+		TransactionId: event.TransactionID,
 	}
 
 	payload, err := proto.Marshal(msg)

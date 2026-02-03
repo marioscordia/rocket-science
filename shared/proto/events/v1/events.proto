@@ -11,4 +11,5 @@ message OrderPaid {
     string order_id = 2; // Unique identifier for the order
     string user_id = 3; // Unique identifier for the user
     payment.v1.PaymentMethod payment_method = 4; // Payment method used
+    string transaction_id = 5; // Transaction identifier
 }

@@ -7,12 +7,13 @@ import (
 )
 
 type mongoEnvConfig struct {
-	Host       string `env:"MONGO_HOST,required"`
-	Port       int    `env:"MONGO_PORT,required"`
-	User       string `env:"MONGO_USER,required"`
-	Password   string `env:"MONGO_PASSWORD,required"`
-	Database   string `env:"MONGO_DATABASE,required"`
-	Collection string `env:"MONGO_COLLECTION,required"`
+	Host               string `env:"MONGO_HOST,required"`
+	Port               int    `env:"MONGO_PORT,required"`
+	InitDBRootUsername string `env:"MONGO_INITDB_ROOT_USERNAME,required"`
+	InitDBRootPassword string `env:"MONGO_INITDB_ROOT_PASSWORD,required"`
+	Database           string `env:"MONGO_DATABASE,required"`
+	Collection         string `env:"MONGO_COLLECTION,required"`
+	AuthDB             string `env:"MONGO_AUTH_DB,required"`
 }
 
 type mongoConfig struct {
@@ -29,11 +30,12 @@ func NewMongoConfig() (*mongoConfig, error) {
 }
 
 func (cfg *mongoConfig) GetURI() string {
-	return fmt.Sprintf("mongodb://%s:%s@%s:%d",
-		cfg.raw.User,
-		cfg.raw.Password,
+	return fmt.Sprintf("mongodb://%s:%s@%s:%d/%s",
+		cfg.raw.InitDBRootUsername,
+		cfg.raw.InitDBRootPassword,
 		cfg.raw.Host,
 		cfg.raw.Port,
+		cfg.raw.AuthDB,
 	)
 }
 
