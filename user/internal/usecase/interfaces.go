@@ -11,4 +11,5 @@ type Repository interface {
 	GetUserByUsername(ctx context.Context, username string) (*model.User, error)
 	CreateUser(ctx context.Context, user *model.User) (string, error)
 	GetSessionByID(ctx context.Context, sessionID string) (*model.Session, error)
+	CreateSession(ctx context.Context, userID string) (string, error)
 }

@@ -11,6 +11,12 @@ type useCase struct {
 	repo Repository
 }
 
+func New(repo Repository) *useCase {
+	return &useCase{
+		repo: repo,
+	}
+}
+
 func (u *useCase) Login(ctx context.Context, username, password string) (string, error) {
 	user, err := u.repo.GetUserByUsername(ctx, username)
 	if err != nil {
@@ -22,8 +28,7 @@ func (u *useCase) Login(ctx context.Context, username, password string) (string,
 		return "", err
 	}
 
-	// TODO: Create session and return session ID
-	return "", nil
+	return u.repo.CreateSession(ctx, user.ID)
 }
 
 func (u *useCase) WhoAmI(ctx context.Context, sessionID string) (*model.User, *model.Session, error) {
